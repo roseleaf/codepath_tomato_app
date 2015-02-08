@@ -81,6 +81,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             let placeholder = UIImage(named: "no_photo")
             cell.posterView.setImageWithURLRequest(urlRequest, placeholderImage: nil, success: nil, failure: nil)
         }
+        let cellBGView = UIView()
+        cellBGView.backgroundColor = UIColor(red: 0, green: 20, blue: 250, alpha: 0.2)
+        cell.selectedBackgroundView = cellBGView
         return cell
     }
 
