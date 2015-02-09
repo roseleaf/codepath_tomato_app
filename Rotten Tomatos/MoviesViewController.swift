@@ -46,6 +46,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     options:NSJSONReadingOptions.MutableContainers, error: &errorPointer) as NSDictionary
                 
                 self.movies = responseDictionary["movies"] as [NSDictionary]
+                NSLog("\(self.movies)")
                 self.tableView.reloadData()
             }
         })

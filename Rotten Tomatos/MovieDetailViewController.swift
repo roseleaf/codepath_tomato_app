@@ -11,10 +11,14 @@ import UIKit
 class MovieDetailViewController: UIViewController {
     var movie: NSDictionary? = NSDictionary?()
     @IBOutlet weak var posterLargeView: UIImageView!
+    @IBOutlet weak var synopsisTextView: UITextView!
+    @IBOutlet weak var titleLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = self.movie?.objectForKey("title") as? String
+        self.synopsisTextView.text = self.movie?.objectForKey("synopsis") as? String
+        self.titleLabel.text = self.movie?.objectForKey("title") as? String
         var imageString = self.movie?.valueForKeyPath("posters.profile") as String!
         let hiResImageString = imageString.stringByReplacingOccurrencesOfString("tmb", withString: "ori", options: NSStringCompareOptions.LiteralSearch, range: nil)
         setPosterImage(imageString)
@@ -32,6 +36,15 @@ class MovieDetailViewController: UIViewController {
         self.posterLargeView.setImageWithURLRequest(urlRequest, placeholderImage: nil, success: nil, failure: nil)
     }
 
+    @IBAction func handlePan(recognizer:UIPanGestureRecognizer) {
+        NSLog("translation \(recognizer.view!.center.y)")
+        let translation = recognizer.translationInView(self.view)
+        if (714 > recognizer.view!.center.y + translation.y  && recognizer.view!.center.y + translation.y > 450) {
+            recognizer.view!.center = CGPoint(x:recognizer.view!.center.x,
+                y:recognizer.view!.center.y + translation.y)
+            recognizer.setTranslation(CGPointZero, inView: self.view)
+        }
+    }
     /*
     // MARK: - Navigation
 
