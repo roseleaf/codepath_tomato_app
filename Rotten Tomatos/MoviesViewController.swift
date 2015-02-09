@@ -10,7 +10,7 @@ import UIKit
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var moviesView: UITableView!
-    var movies = []
+    var movies = [Movie]()
     var refreshControl: UIRefreshControl!
 
     @IBOutlet weak var tableView: UITableView!
@@ -44,9 +44,18 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             } else {
                 var responseDictionary = NSJSONSerialization.JSONObjectWithData(data,
                     options:NSJSONReadingOptions.MutableContainers, error: &errorPointer) as NSDictionary
-                
-                self.movies = responseDictionary["movies"] as [NSDictionary]
-                NSLog("\(self.movies)")
+                var moviesAr: Array = responseDictionary["movies"] as NSArray
+                self.movies = moviesAr.map({ (m) -> Movie in
+                    return Movie(
+                        title: m.valueForKeyPath("title") as String,
+                        synopsis: m.valueForKeyPath("synopsis") as String,
+                        runtime: m.valueForKeyPath("runtime") as Int,
+                        year: m.valueForKeyPath("year") as Int,
+                        imageURL: m.valueForKeyPath("posters.profile") as String,
+                        audienceScore: m.valueForKeyPath("ratings.audience_score") as Int)
+                    })
+
+                NSLog("\(self.movies[0])")
                 self.tableView.reloadData()
             }
         })
@@ -73,11 +82,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCellWithIdentifier("MovieCell") as MovieCell
         if (self.movies.count > 0) {
-            var movie = self.movies[indexPath.row] as? NSDictionary
-            cell.titleLabel.text = movie?.objectForKey("title") as? String
-            cell.synopsisLabel.text = movie?.objectForKey("synopsis") as? String
-            var imageString = movie?.valueForKeyPath("posters.profile") as? String
-            var photoUrl = NSURL(string: imageString!)
+            var movie = self.movies[indexPath.row]
+            cell.titleLabel.text = movie.title
+            cell.synopsisLabel.text = movie.synopsis
+            var imageString = movie.imageURL
+            var photoUrl = NSURL(string: imageString)
             let urlRequest = NSURLRequest(URL: photoUrl!)
             let placeholder = UIImage(named: "no_photo")
             cell.posterView.setImageWithURLRequest(urlRequest, placeholderImage: nil, success: nil, failure: nil)
@@ -96,7 +105,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         var row = indexPath?.row
         if (row != nil) {
             println(row!)
-            var movie = self.movies[row!] as NSDictionary
+            var movie = self.movies[row!]
             vc.movie = movie
         }
     }
