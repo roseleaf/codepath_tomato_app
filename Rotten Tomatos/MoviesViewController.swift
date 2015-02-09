@@ -8,10 +8,11 @@
 
 import UIKit
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UISearchDisplayDelegate {
     @IBOutlet weak var moviesView: UITableView!
     var movies = [Movie]()
     var refreshControl: UIRefreshControl!
+    var filteredMovies = [Movie]()
 
     @IBOutlet weak var tableView: UITableView!
     override func viewDidLoad() {
@@ -25,6 +26,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
         tableView.insertSubview(refreshControl, atIndex: 0)
         self.loadMovieData()
+        self.searchDisplayController?.searchResultsTableView.registerClass(MovieCell.self, forCellReuseIdentifier: "MovieCell")
+        let nibName = UINib(nibName: "MovieCell", bundle:nil)
+
+        self.searchDisplayController?.searchResultsTableView.registerNib(nibName, forCellReuseIdentifier: "MovieCell")
         
         self.tableView.reloadData()
         SVProgressHUD.dismiss()
@@ -76,13 +81,22 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.movies.count
+        if tableView == self.searchDisplayController!.searchResultsTableView {
+            return self.filteredMovies.count
+        } else {
+            return self.movies.count
+        }
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCellWithIdentifier("MovieCell") as MovieCell
         if (self.movies.count > 0) {
-            var movie = self.movies[indexPath.row]
+            var movie : Movie!
+            if tableView == self.searchDisplayController!.searchResultsTableView {
+                movie = self.filteredMovies[indexPath.row]
+            } else {
+                movie = self.movies[indexPath.row]
+            }
             cell.titleLabel.text = movie.title
             cell.synopsisLabel.text = movie.synopsis
             var imageString = movie.imageURL
@@ -123,6 +137,24 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         delay(2, closure: {
             self.refreshControl.endRefreshing()
         })
+    }
+    
+    func filterContentForSearchText(searchText: String) {
+        // Filter the array using the filter method
+        self.filteredMovies = self.movies.filter({( movie: Movie) -> Bool in
+            let stringMatch = movie.title.rangeOfString(searchText)
+            return stringMatch != nil
+        })
+    }
+    
+    func searchDisplayController(controller: UISearchDisplayController!, shouldReloadTableForSearchString searchString: String!) -> Bool {
+        self.filterContentForSearchText(searchString)
+        return true
+    }
+    
+    func searchDisplayController(controller: UISearchDisplayController!, shouldReloadTableForSearchScope searchOption: Int) -> Bool {
+        self.filterContentForSearchText(self.searchDisplayController!.searchBar.text)
+        return true
     }
     /*
     // MARK: - Navigation
