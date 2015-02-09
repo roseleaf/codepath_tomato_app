@@ -25,5 +25,5 @@ Hours spent: `~20`
 - [/] Add a search bar: pretty simple implementation of searching against the existing table view data.
 
 #### GIF demo
-![](img/tomato.gif]
+![](img/tomato.gif)
 
