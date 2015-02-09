@@ -2,7 +2,7 @@
 
 This is a movies app displaying box office and using the [Rotten Tomatoes API](http://developer.rottentomatoes.com/docs/read/JSON).
 
-Time spent: `8`
+Hours spent: `~20`
 
 ### Features
 
@@ -23,4 +23,7 @@ Time spent: `8`
 - [x] Customize the navigation bar.
 - [ ] Add a tab bar for Box Office and DVD.
 - [/] Add a search bar: pretty simple implementation of searching against the existing table view data.
+
+#### GIF demo
+![](img/tomato.gif]
 
